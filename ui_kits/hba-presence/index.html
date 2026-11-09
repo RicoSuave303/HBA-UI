@@ -1,0 +1,97 @@
+<!-- @dsCard group="HBA Presence" viewport="1280x800" name="HBA Presence Page prototype" subtitle="Metro Denver HBA → builder → Parade of Homes → buyer account" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HBA Presence Page · Hoodle</title>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#009788"/><text x="50" y="62" text-anchor="middle" font-family="Poppins,Arial,sans-serif" font-size="30" font-weight="600" fill="#fff">HBA</text></svg></template>
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script src="data.js"></script>
+<style>html,body{height:100%;margin:0}body{background:var(--ink-100);overflow:hidden}#root{height:100%}.leaflet-container{font-family:var(--font-sans)}.leaflet-tooltip{font:400 12px/1.4 var(--font-sans);color:var(--ink-800);border-radius:6px;border:0;box-shadow:var(--shadow-md)}</style>
+</head><body><div id="root"></div>
+<script type="text/babel" src="Shell.jsx"></script>
+<script type="text/babel" src="PresenceTop.jsx"></script>
+<script type="text/babel" src="PresenceBottom.jsx"></script>
+<script type="text/babel" src="BuilderPage.jsx"></script>
+<script type="text/babel" src="ShowcasePage.jsx"></script>
+<script type="text/babel" src="Account.jsx"></script>
+<script type="text/babel">
+const { Toast } = window.HoodleDesignSystem_ee4a2a;
+const LS = 'hoodle-hba-demo';
+const init = (() => { try { return JSON.parse(localStorage.getItem(LS)) || {}; } catch (e) { return {}; } })();
+
+function Seg({ value, onChange, options }) {
+  return <div style={{ display: 'flex', background: 'rgba(255,255,255,.08)', padding: 3, borderRadius: 8, gap: 2 }}>
+    {options.map(([v, l]) => <button key={v} type="button" onClick={() => onChange(v)} style={{ height: 28, padding: '0 11px', border: 0, borderRadius: 6, background: value === v ? '#fff' : 'transparent', color: value === v ? 'var(--ink-900)' : 'rgba(255,255,255,.78)', font: '500 12px var(--font-sans)', cursor: 'pointer', whiteSpace: 'nowrap' }}>{l}</button>)}
+  </div>;
+}
+
+function App() {
+  const [screen, setScreen] = React.useState(init.screen || 'hba');
+  const [params, setParams] = React.useState(init.params || {});
+  const [viewAs, setViewAs] = React.useState(init.viewAs || 'buyer');
+  const [device, setDevice] = React.useState(init.device || 'desktop');
+  const [user, setUser] = React.useState(init.user || null);
+  const [saved, setSaved] = React.useState(() => ({ homes: new Set(init.sh || []), builders: new Set(init.sb || []), products: new Set(init.sp || []) }));
+  const [ratings, setRatings] = React.useState(init.ratings || {});
+  const [notes, setNotes] = React.useState(init.notes || {});
+  const [home, setHome] = React.useState(null);
+  const [reg, setReg] = React.useState(null);
+  const [toast, setToast] = React.useState(null);
+  const [w, setW] = React.useState(1280);
+  const scroller = React.useRef(null);
+
+  React.useEffect(() => { localStorage.setItem(LS, JSON.stringify({ screen, params, viewAs, device, user, ratings, notes, sh: [...saved.homes], sb: [...saved.builders], sp: [...saved.products] })); }, [screen, params, viewAs, device, user, saved, ratings, notes]);
+  React.useEffect(() => { const el = scroller.current; const ro = new ResizeObserver(() => setW(el.clientWidth)); ro.observe(el); setW(el.clientWidth); return () => ro.disconnect(); }, [device]);
+
+  const notify = msg => { setToast(msg); clearTimeout(window.__tt); window.__tt = setTimeout(() => setToast(null), 3200); };
+  const scrollToId = id => { const el = scroller.current.querySelector('#' + id); if (el) scroller.current.scrollTo({ top: el.getBoundingClientRect().top - scroller.current.getBoundingClientRect().top + scroller.current.scrollTop - 130, behavior: 'smooth' }); };
+  const go = (s, p = {}) => { setScreen(s); setParams(p); setHome(null); requestAnimationFrame(() => { if (p.anchor) scrollToId(p.anchor); else scroller.current.scrollTop = 0; }); };
+  const requireUser = fn => { if (user) fn(); else setReg(() => fn); };
+  const toggleSave = (kind, id) => requireUser(() => setSaved(s => { const n = new Set(s[kind]); const had = n.has(id); had ? n.delete(id) : n.add(id); if (!had) notify(kind === 'products' ? 'Saved to your product wishlist.' : kind === 'builders' ? 'Builder saved.' : 'Home saved to My Hoodle.'); return { ...s, [kind]: n }; }));
+  const setRating = (id, v) => setRatings(r => ({ ...r, [id]: v }));
+  const setNote = (id, v) => setNotes(n => ({ ...n, [id]: v }));
+  const openHome = id => setHome(id);
+
+  const m = device === 'mobile' || w < 760;
+  const P = { go, saved, toggleSave, requireUser, user, notify, scrollToId, openHome, ratings, notes };
+  const mobile = device === 'mobile';
+
+  return <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div data-demo-bar style={{ flex: 'none', background: 'var(--ink-900)', color: '#fff', display: 'flex', alignItems: 'center', gap: 14, padding: '8px 16px', flexWrap: 'wrap' }}>
+      <span style={{ font: '500 12px var(--font-sans)', color: 'var(--gold-300)', letterSpacing: '.1em', textTransform: 'uppercase' }}>HBA demo</span>
+      <Seg value={screen} onChange={s => go(s, s === 'builder' ? { id: 'frontrange' } : {})} options={[['hba', 'HBA page'], ['builder', 'Builder page'], ['showcase', 'Parade of Homes'], ['account', 'Buyer account']]} />
+      <div style={{ flex: 1 }}></div>
+      <span style={{ font: '400 12px var(--font-sans)', color: 'rgba(255,255,255,.6)' }}>View as</span>
+      <Seg value={viewAs} onChange={setViewAs} options={[['buyer', 'Buyer'], ['eo', 'HBA executive']]} />
+      <Seg value={device} onChange={setDevice} options={[['desktop', 'Desktop'], ['mobile', 'Mobile']]} />
+      <button type="button" onClick={() => { setUser(null); setSaved({ homes: new Set(), builders: new Set(), products: new Set() }); setRatings({}); setNotes({}); go('hba'); }} style={{ border: 0, background: 'none', color: 'rgba(255,255,255,.6)', font: '400 12px var(--font-sans)', cursor: 'pointer' }}>Reset</button>
+    </div>
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', justifyContent: 'center', alignItems: mobile ? 'center' : 'stretch', padding: mobile ? 20 : 0 }}>
+      <div style={{ width: mobile ? 390 : '100%', height: mobile ? 'min(844px, 100%)' : '100%', borderRadius: mobile ? 36 : 0, border: mobile ? '10px solid var(--ink-900)' : 0, boxShadow: mobile ? 'var(--shadow-lg)' : 'none', overflow: 'hidden', background: '#fff', transform: 'translateZ(0)', position: 'relative' }}>
+        <div ref={scroller} style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+          <ViewCtx.Provider value={{ m, viewAs }}>
+            <TopNav onHome={() => go('hba')} onAccount={() => user ? go('account') : requireUser(() => go('account'))} user={user} />
+            <main data-screen-label={screen}>
+              {screen === 'hba' && <PresencePage {...P} />}
+              {screen === 'builder' && <BuilderPage {...P} id={params.id} />}
+              {screen === 'showcase' && <ShowcasePage {...P} />}
+              {screen === 'account' && <AccountPage {...P} />}
+            </main>
+            <Footer />
+            {home && <ModelHomeSheet id={home} onClose={() => setHome(null)} {...P} setRating={setRating} setNote={setNote} />}
+            <RegisterDialog open={!!reg} onClose={() => setReg(null)} onDone={u => { setUser(u); const fn = reg; setReg(null); notify('Welcome to Hoodle, ' + u.first + '.'); setTimeout(() => fn && fn(), 0); }} />
+          </ViewCtx.Provider>
+        </div>
+        {toast && <div style={{ position: 'absolute', left: 0, right: 0, bottom: 24, display: 'flex', justifyContent: 'center', zIndex: 2000, pointerEvents: 'none', padding: '0 16px' }}><div style={{ pointerEvents: 'auto' }}><Toast onClose={() => setToast(null)}>{toast}</Toast></div></div>}
+      </div>
+    </div>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script></body></html>

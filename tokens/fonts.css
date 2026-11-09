@@ -1,0 +1,6 @@
+/* Substitute: Poppins (Google Fonts, OFL) — nearest match to the primary logo's geometric sans. Replace with licensed brand files if they differ. Latin subset. */
+@font-face{font-family:'Poppins';font-style:normal;font-weight:300;font-display:swap;src:url('../fonts/Poppins-300.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/Poppins-400.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/Poppins-500.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/Poppins-600.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:swap;src:url('../fonts/Poppins-700.woff2') format('woff2')}

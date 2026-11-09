@@ -1,0 +1,19 @@
+:root{
+/* Brand teal — sampled from primary logo (#009788) */
+--teal-50:#E6F5F3;--teal-100:#C2E8E3;--teal-200:#8FD5CC;--teal-300:#52BDB0;--teal-400:#1FA898;--teal-500:#009788;--teal-600:#007F73;--teal-700:#00665D;--teal-800:#004D46;--teal-900:#00332F;
+/* Gold — sampled from tagline rules (#CEA565) */
+--gold-50:#FAF5EC;--gold-100:#F2E6CF;--gold-300:#DEC195;--gold-500:#CEA565;--gold-700:#9C7A40;--gold-900:#5E4924;
+/* Ink neutrals — navy-tinted, anchored on tagline ink (#101828) */
+--ink-0:#FFFFFF;--ink-25:#FBFCFC;--ink-50:#F5F7F8;--ink-100:#EDF0F2;--ink-200:#DEE3E7;--ink-300:#C5CDD4;--ink-400:#98A2AE;--ink-500:#6B7684;--ink-600:#4B5563;--ink-700:#344051;--ink-800:#1F2937;--ink-900:#101828;
+/* Legacy teal (pre-2026 VAG-style logo) — reference only */
+--legacy-teal:#188880;--legacy-teal-dark:#107068;
+/* Semantic */
+--success-500:#1F9254;--success-50:#E8F5EE;--warning-500:#B7791F;--warning-50:#FBF3E4;--danger-500:#C8372D;--danger-50:#FBECEA;--info-500:#2B6CB0;--info-50:#EAF1F9;
+
+/* Aliases */
+--brand-primary:var(--teal-500);--brand-primary-hover:var(--teal-600);--brand-primary-press:var(--teal-700);--brand-accent:var(--gold-500);--brand-ink:var(--ink-900);
+--text-strong:var(--ink-900);--text-body:var(--ink-700);--text-muted:var(--ink-500);--text-subtle:var(--ink-400);--text-on-brand:#FFFFFF;--text-brand:var(--teal-600);--text-link:var(--teal-600);--text-link-hover:var(--teal-700);
+--surface-page:#FFFFFF;--surface-sunken:var(--ink-50);--surface-card:#FFFFFF;--surface-brand:var(--teal-500);--surface-brand-soft:var(--teal-50);--surface-ink:var(--ink-900);--surface-accent-soft:var(--gold-50);
+--border-subtle:var(--ink-100);--border-default:var(--ink-200);--border-strong:var(--ink-300);--border-focus:var(--teal-500);
+--focus-ring:0 0 0 3px rgba(0,151,136,.28);
+}
